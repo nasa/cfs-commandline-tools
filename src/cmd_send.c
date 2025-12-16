@@ -309,6 +309,14 @@ void CollectOptions(int argc, char *argv[])
         {
             ++ConsoleUtils_Verbosity;
         }
+        else  if (argv_ptr->OptionId == CmdSend_OptionId_host)
+        {
+            strncpy(CommandData.HostName, optarg, sizeof(CommandData.HostName) - 1);
+        }
+        else  if (argv_ptr->OptionId == CmdSend_OptionId_port)
+        {
+            strncpy(CommandData.PortNum, optarg, sizeof(CommandData.PortNum) - 1);
+        }
         else if (opt_ptr->has_arg != no_argument && optarg != NULL)
         {
             argv_ptr->Text = optarg;
