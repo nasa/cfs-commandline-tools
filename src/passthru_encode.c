@@ -665,7 +665,7 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
 
             tempull = strtoull(ArgV->Text, &tail, 0);
 
-            if (*tail == ':' && tempull != 0)
+            if (*tail != ':' || tempull == 0)
             {
                 snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
                          "ERROR: %s:%u - String format is NNN:string, not: \'%s\'\n", __func__, __LINE__, ArgV->Text);
