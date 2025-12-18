@@ -138,7 +138,6 @@ typedef struct
     int             OptionCount;
     int             NonOptionCount;
     CmdSend_ArgV_t *ArgV;
-    // CmdSend_OptInfo_t OptInfo[CmdSend_OptionId_MAX];
 
     int                 NumParsers;
     int                 GoodParsers;

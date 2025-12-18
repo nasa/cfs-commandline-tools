@@ -42,28 +42,29 @@
 #include "cfe_hdr_eds_datatypes.h"
 #include "cfe_mission_eds_parameters.h"
 #include "cfe_mission_eds_interface_parameters.h"
+#include "edslib_global.h"
 #include "edslib_displaydb.h"
 #include "edslib_intfdb.h"
 #include "cfe_missionlib_runtime.h"
 #include "cfe_missionlib_api.h"
 
-#define BASE_SERVER_PORT 2234
+#include "tlm_recv.h"
 
-EdsNativeBuffer_CFE_HDR_TelemetryHeader_t LocalBuffer;
-EdsPackedBuffer_CFE_HDR_TelemetryHeader_t NetworkBuffer;
+typedef struct EDS_Decoder
+{
+    EdsNativeBuffer_CFE_HDR_TelemetryHeader_t LocalBuffer;
 
-static const char *optString = "c:?";
+} EDS_Decoder_t;
 
 static const EdsLib_Id_t CFE_SB_TELEMETRY_CMD_ID =
     EDSLIB_INTF_ID(EDS_INDEX(CFE_SB), EdsCommand_CFE_SB_Telemetry_indication_DECLARATION);
 
-/*
-** getopts_long long form argument table
-*/
-static struct option longOpts[] = {
-    {"cpu", required_argument, NULL, 'c'}, {"help", no_argument, NULL, '?'}, {NULL, no_argument, NULL, 0}};
-
-void TlmUtilDisplay(void *Arg, const EdsLib_EntityDescriptor_t *Param)
+/*----------------------------------------------------------------
+ *
+ * Helper function
+ *
+ *-----------------------------------------------------------------*/
+void EDS_DecodeDisplay(void *Arg, const EdsLib_EntityDescriptor_t *Param)
 {
     uint8_t *BasePtr;
     char     OutputBuffer[256];
@@ -74,13 +75,29 @@ void TlmUtilDisplay(void *Arg, const EdsLib_EntityDescriptor_t *Param)
     printf("%s(): Bit=%-4d %35s = %s\n", __func__, Param->EntityInfo.Offset.Bits, Param->FullName, OutputBuffer);
 }
 
-int main(int argc, char *argv[])
+/*----------------------------------------------------------------
+ *
+ * API function
+ *
+ *-----------------------------------------------------------------*/
+void *EDS_Instantiate(void)
 {
-    int                                      opt       = 0;
-    int                                      longIndex = 0;
-    int                                      sd, rc, n, cliLen;
-    struct sockaddr_in                       cliAddr, servAddr;
-    unsigned short                           Port;
+    EDS_Decoder_t *obj;
+
+    obj = malloc(sizeof(*obj));
+    memset(obj, 0, sizeof(*obj));
+
+    return obj;
+}
+
+/*----------------------------------------------------------------
+ *
+ * API function
+ *
+ *-----------------------------------------------------------------*/
+bool EDS_DisplayObject(void *arg, const void *Data, size_t Size)
+{
+    EDS_Decoder_t *tlm = arg;
     EdsLib_Id_t                              EdsId;
     EdsLib_DataTypeDB_TypeInfo_t             TypeInfo;
     EdsInterface_CFE_SB_SoftwareBus_PubSub_t PubSubParams;
@@ -89,132 +106,76 @@ int main(int argc, char *argv[])
     char                                     TempBuffer[64];
     int32_t                                  Status;
 
-    EdsDataType_CFE_HDR_Message_t *MessagePtr = (EdsDataType_CFE_HDR_Message_t *)(void *)&LocalBuffer;
+    EdsLib_SizeInfo_t ProcessedSize;
+    EdsLib_SizeInfo_t MaxSize;
 
-    Port = BASE_SERVER_PORT;
-    opt  = getopt_long(argc, argv, optString, longOpts, &longIndex);
-    while (opt != -1)
+    memset(&ProcessedSize, 0, sizeof(ProcessedSize));
+    memset(&MaxSize, 0, sizeof(MaxSize));
+
+    ConsoleUtils_Hexdump(Data, Size);
+
+    EdsId  = EDSLIB_MAKE_ID(EDS_INDEX(CFE_HDR), EdsContainer_CFE_HDR_TelemetryHeader_DATADICTIONARY);
+    Status = EdsLib_DataTypeDB_GetTypeInfo(&EDS_DATABASE, EdsId, &TypeInfo);
+    if (Status != EDSLIB_SUCCESS)
     {
-        switch (opt)
-        {
-            case 'c':
-                Port += atoi(optarg) - 1;
-                break;
-
-            case '?':
-                break;
-
-            default:
-                break;
-        }
-
-        opt = getopt_long(argc, argv, optString, longOpts, &longIndex);
+        return false;
     }
 
-    /*
-    ** socket creation
-    */
-    sd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sd < 0)
+    MaxSize.Bits = EdsLib_OCTETS_TO_BITS(Size);
+    MaxSize.Bytes = sizeof(tlm->LocalBuffer);
+
+    Status = EdsLib_DataTypeDB_UnpackPartialObjectVarSize(&EDS_DATABASE, &EdsId, tlm->LocalBuffer.Byte, Data, &MaxSize, &ProcessedSize);
+    if (Status != EDSLIB_SUCCESS)
     {
-        printf("%s: cannot open socket \n", argv[0]);
-        exit(1);
+        return false;
     }
 
-    /*
-    ** bind local server port
-    */
-    servAddr.sin_family      = AF_INET;
-    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servAddr.sin_port        = htons(Port);
-    rc                       = bind(sd, (struct sockaddr *)&servAddr, sizeof(servAddr));
-    if (rc < 0)
+    CFE_MissionLib_Get_PubSub_Parameters(&PubSubParams, &tlm->LocalBuffer.BaseObject.Message);
+    CFE_MissionLib_UnmapPublisherComponent(&PublisherParams, &PubSubParams);
+
+    Status = CFE_MissionLib_GetTopicInfo(&CFE_SOFTWAREBUS_INTERFACE, PublisherParams.Telemetry.TopicId, &TopicInfo);
+    if (Status != CFE_MISSIONLIB_SUCCESS)
     {
-        printf("%s: cannot bind port number %d \n", argv[0], Port);
-        exit(1);
+        return false;
     }
 
-    printf("%s: waiting for data on port UDP %u\n", argv[0], Port);
-
-    /* server infinite loop */
-    while (1)
+    Status = EdsLib_IntfDB_FindAllArgumentTypes(&EDS_DATABASE, CFE_SB_TELEMETRY_CMD_ID, TopicInfo.ParentIntfId,
+                                                &EdsId, 1);
+    if (Status != EDSLIB_SUCCESS)
     {
+        return false;
+    }
 
-        /*
-        ** receive message
-        */
-        cliLen = sizeof(cliAddr);
-        n = recvfrom(sd, NetworkBuffer, sizeof(NetworkBuffer), 0, (struct sockaddr *)&cliAddr, (socklen_t *)&cliLen);
+    Status = EdsLib_DataTypeDB_UnpackPartialObjectVarSize(&EDS_DATABASE, &EdsId, tlm->LocalBuffer.Byte, Data, &MaxSize, &ProcessedSize);
+    if (Status != EDSLIB_SUCCESS)
+    {
+        return false;
+    }
 
-        if (n < 0)
-        {
-            printf("%s: cannot receive data \n", argv[0]);
-            continue;
-        }
+    CONSOLEUTILS_INFO("Formatcode=%08lx / %s\n", (unsigned long)EdsId,
+            EdsLib_DisplayDB_GetTypeName(&EDS_DATABASE, EdsId, TempBuffer, sizeof(TempBuffer)));
 
-        /*
-        ** print received message
-        */
+    Status = EdsLib_DataTypeDB_VerifyUnpackedObject(&EDS_DATABASE, EdsId, tlm->LocalBuffer.Byte, Data,
+                                                    EDSLIB_DATATYPEDB_RECOMPUTE_NONE);
+    if (Status != EDSLIB_SUCCESS)
+    {
+        CONSOLEUTILS_ERROR("NOTE - EDS VERIFICATION FAILED: code=%d\n", (int)Status);
+    }
 
-        printf("Telemetry Packet From: %s:UDP%u, %u bits : \n", inet_ntoa(cliAddr.sin_addr), ntohs(cliAddr.sin_port),
-               8 * n);
+    EdsLib_DisplayDB_IterateAllEntities(&EDS_DATABASE, EdsId, EDS_DecodeDisplay, tlm->LocalBuffer.Byte);
 
-        if (n > 0)
-        {
-            EdsLib_Generate_Hexdump(stdout, NetworkBuffer, 0, n);
-        }
-
-        EdsId  = EDSLIB_MAKE_ID(EDS_INDEX(CFE_HDR), EdsContainer_CFE_HDR_TelemetryHeader_DATADICTIONARY);
-        Status = EdsLib_DataTypeDB_GetTypeInfo(&EDS_DATABASE, EdsId, &TypeInfo);
-        if (Status != EDSLIB_SUCCESS)
-        {
-            return Status;
-        }
-
-        Status = EdsLib_DataTypeDB_UnpackPartialObject(&EDS_DATABASE, &EdsId, LocalBuffer.Byte, NetworkBuffer,
-                                                       sizeof(LocalBuffer), 8 * n, 0);
-        if (Status != EDSLIB_SUCCESS)
-        {
-            return Status;
-        }
-
-        CFE_MissionLib_Get_PubSub_Parameters(&PubSubParams, MessagePtr);
-        CFE_MissionLib_UnmapPublisherComponent(&PublisherParams, &PubSubParams);
-
-        Status = CFE_MissionLib_GetTopicInfo(&CFE_SOFTWAREBUS_INTERFACE, PublisherParams.Telemetry.TopicId, &TopicInfo);
-        if (Status != CFE_MISSIONLIB_SUCCESS)
-        {
-            return Status;
-        }
-
-        Status = EdsLib_IntfDB_FindAllArgumentTypes(&EDS_DATABASE, CFE_SB_TELEMETRY_CMD_ID, TopicInfo.ParentIntfId,
-                                                    &EdsId, 1);
-        if (Status != EDSLIB_SUCCESS)
-        {
-            return Status;
-        }
-
-        Status = EdsLib_DataTypeDB_UnpackPartialObject(&EDS_DATABASE, &EdsId, LocalBuffer.Byte, NetworkBuffer,
-                                                       sizeof(LocalBuffer), 8 * n, TypeInfo.Size.Bytes);
-        if (Status != EDSLIB_SUCCESS)
-        {
-            return Status;
-        }
-
-        printf("Formatcode=%08lx / %s\n", (unsigned long)EdsId,
-               EdsLib_DisplayDB_GetTypeName(&EDS_DATABASE, EdsId, TempBuffer, sizeof(TempBuffer)));
-
-        Status = EdsLib_DataTypeDB_VerifyUnpackedObject(&EDS_DATABASE, EdsId, LocalBuffer.Byte, NetworkBuffer,
-                                                        EDSLIB_DATATYPEDB_RECOMPUTE_NONE);
-        if (Status != EDSLIB_SUCCESS)
-        {
-            printf("NOTE - EDS VERIFICATION FAILED: code=%d\n", (int)Status);
-        }
-
-        EdsLib_DisplayDB_IterateAllEntities(&EDS_DATABASE, EdsId, TlmUtilDisplay, LocalBuffer.Byte);
-        printf("\n");
-
-    } /* end of server infinite loop */
-
-    return 0;
+    return true;
 }
+
+/*----------------------------------------------------------------
+ *
+ * API structure
+ *
+ *-----------------------------------------------------------------*/
+/* clang-format off */
+const TlmRecv_Display_API_t EDS_API =
+{
+    .Name = "EDS",
+    .Instantiate = EDS_Instantiate,
+    .DisplayObject = EDS_DisplayObject
+};

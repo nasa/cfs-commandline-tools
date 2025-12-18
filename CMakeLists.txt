@@ -32,6 +32,12 @@ set(CMDSEND_SOURCE_LIST
     src/passthru_encode.c
 )
 
+set(TLMRECV_SOURCE_LIST
+    src/tlm_recv.c
+    src/console_utils.c
+    src/passthru_decode.c
+)
+
 if (CFE_EDS_ENABLED)
 
     list(APPEND UTIL_LINK_LIBS
@@ -45,6 +51,9 @@ if (CFE_EDS_ENABLED)
     list(APPEND CMDSEND_SOURCE_LIST
         src/eds_encode.c
     )
+    list(APPEND TLMRECV_SOURCE_LIST
+        src/eds_decode.c
+    )
 
 endif()
 
@@ -56,7 +65,7 @@ target_link_libraries(cmd_send ${UTIL_LINK_LIBS})
 install(TARGETS cmd_send DESTINATION host)
 
 
-## CMake snippet for building tlm display/decoder tool
-#add_executable(tlm_show src/tlm_show.c)
-#target_link_libraries(tlm_show ${UTIL_LINK_LIBS})
-#install(TARGETS tlm_show DESTINATION host)
+# CMake snippet for building tlm display/decoder tool
+add_executable(tlm_recv ${TLMRECV_SOURCE_LIST})
+target_link_libraries(tlm_recv ${UTIL_LINK_LIBS})
+install(TARGETS tlm_recv DESTINATION host)
