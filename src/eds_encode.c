@@ -136,7 +136,8 @@ static void Enumerate_Topics_Usage_Callback(void *Arg, uint16_t TopicId, EdsLib_
  *-----------------------------------------------------------------*/
 static void Enumerate_Constraint_Callback(const EdsLib_DatabaseObject_t        *GD,
                                           const EdsLib_DataTypeDB_EntityInfo_t *MemberInfo,
-                                          EdsLib_GenericValueBuffer_t *ConstraintValue, void *Arg)
+                                          EdsLib_GenericValueBuffer_t          *ConstraintValue,
+                                          void                                 *Arg)
 {
     char *Buffer = Arg;
 
@@ -164,7 +165,8 @@ static void Enumerate_Constraint_Callback(const EdsLib_DatabaseObject_t        *
  *-----------------------------------------------------------------*/
 static void Match_Constraint_Callback(const EdsLib_DatabaseObject_t        *GD,
                                       const EdsLib_DataTypeDB_EntityInfo_t *MemberInfo,
-                                      EdsLib_GenericValueBuffer_t *ConstraintValue, void *Arg)
+                                      EdsLib_GenericValueBuffer_t          *ConstraintValue,
+                                      void                                 *Arg)
 {
     EDS_ConstraintMatch_t *Result = Arg;
 
@@ -261,8 +263,10 @@ bool EDS_ProcessDestIntf(CommandData_t *cmd)
         {
             if (cmd->DestIntf[0] != 0)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "Dest Interface Argument: '%s' rejected. Interface not known.\n", cmd->DestIntf);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "Dest Interface Argument: '%s' rejected. Interface not known.\n",
+                         cmd->DestIntf);
             }
             return false;
         }
@@ -292,7 +296,8 @@ bool EDS_ProcessDestIntf(CommandData_t *cmd)
         }
         if (EdsRc == EDSLIB_SUCCESS)
         {
-            EdsRc = CFE_MissionLib_FindTopicIdFromIntfId(&CFE_SOFTWAREBUS_INTERFACE, cmd->IntfEdsId,
+            EdsRc = CFE_MissionLib_FindTopicIdFromIntfId(&CFE_SOFTWAREBUS_INTERFACE,
+                                                         cmd->IntfEdsId,
                                                          &cmd->Params.Telecommand.TopicId);
         }
 
@@ -300,8 +305,10 @@ bool EDS_ProcessDestIntf(CommandData_t *cmd)
         {
             if (cmd->DestIntf[0] != 0)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "Dest Interface Argument: '%s' rejected. Interface not known.\n", cmd->DestIntf);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "Dest Interface Argument: '%s' rejected. Interface not known.\n",
+                         cmd->DestIntf);
             }
             return false;
         }
@@ -309,7 +316,9 @@ bool EDS_ProcessDestIntf(CommandData_t *cmd)
         EdsRc = EdsLib_IntfDB_GetComponentInterfaceInfo(&EDS_DATABASE, cmd->IntfEdsId, &IntfInfo);
         if (EdsRc != EDSLIB_SUCCESS)
         {
-            snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText), "Cannot lookup interface info for: '%s'\n",
+            snprintf(cmd->LastErrorText,
+                     sizeof(cmd->LastErrorText),
+                     "Cannot lookup interface info for: '%s'\n",
                      cmd->DestIntf);
             return false;
         }
@@ -323,12 +332,16 @@ bool EDS_ProcessDestIntf(CommandData_t *cmd)
         EdsLib_IntfDB_FindAllArgumentTypes(&EDS_DATABASE, CFE_SB_TELECOMMAND_CMD_ID, cmd->IntfEdsId, &cmd->IntfArg, 1);
     if (EdsRc != EDSLIB_SUCCESS)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText), "Cannot lookup argument type for: '%s', rc=%d\n",
-                 cmd->DestIntf, (int)EdsRc);
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "Cannot lookup argument type for: '%s', rc=%d\n",
+                 cmd->DestIntf,
+                 (int)EdsRc);
         return false;
     }
 
-    CONSOLEUTILS_INFO("Base Indication Argument EdsId=%x / %s\n", (unsigned int)cmd->IntfArg,
+    CONSOLEUTILS_INFO("Base Indication Argument EdsId=%x / %s\n",
+                      (unsigned int)cmd->IntfArg,
                       EdsLib_DisplayDB_GetBaseName(&EDS_DATABASE, cmd->IntfArg));
 
     cmd->ActualArg = cmd->IntfArg;
@@ -369,7 +382,10 @@ bool EDS_ProcessCmdCode(CommandData_t *cmd)
         {
             if (IsNumeric)
             {
-                EdsLib_DataTypeDB_ConstraintIterator(&EDS_DATABASE, cmd->IntfArg, PossibleId, Match_Constraint_Callback,
+                EdsLib_DataTypeDB_ConstraintIterator(&EDS_DATABASE,
+                                                     cmd->IntfArg,
+                                                     PossibleId,
+                                                     Match_Constraint_Callback,
                                                      &ConstraintMatch);
             }
             else
@@ -390,20 +406,27 @@ bool EDS_ProcessCmdCode(CommandData_t *cmd)
         {
             if (cmd->CmdName[0] == 0)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "Dest Interface requires a derivative specifier / command code: \'%s\'\n", cmd->DestIntf);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "Dest Interface requires a derivative specifier / command code: \'%s\'\n",
+                         cmd->DestIntf);
             }
             else
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "Command \'%s\' not found within interface \'%s\'\n", cmd->CmdName, cmd->DestIntf);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "Command \'%s\' not found within interface \'%s\'\n",
+                         cmd->CmdName,
+                         cmd->DestIntf);
             }
             return false;
         }
     }
     else if (cmd->CmdName[0] != 0)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText), "Dest Interface does not have command codes: \'%s\'\n",
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "Dest Interface does not have command codes: \'%s\'\n",
                  cmd->DestIntf);
         return false;
     }
@@ -420,12 +443,15 @@ bool EDS_LookupPayloadDetail(CommandData_t *cmd)
 {
     uint16_t Idx;
 
-    CONSOLEUTILS_INFO("Actual Indication Argument EdsId=%x / %s\n", (unsigned int)cmd->ActualArg,
+    CONSOLEUTILS_INFO("Actual Indication Argument EdsId=%x / %s\n",
+                      (unsigned int)cmd->ActualArg,
                       EdsLib_DisplayDB_GetBaseName(&EDS_DATABASE, cmd->ActualArg));
 
     if (EdsLib_DataTypeDB_GetTypeInfo(&EDS_DATABASE, cmd->ActualArg, &cmd->EdsTypeInfo) != EDSLIB_SUCCESS)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText), "Error retrieving info for code %x\n",
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "Error retrieving info for code %x\n",
                  (unsigned int)cmd->ActualArg);
         return false;
     }
@@ -488,8 +514,10 @@ bool EDS_CheckValidPayload(CommandData_t *cmd)
             EdsRc = EdsLib_DataTypeDB_InitializeNativeObject(&EDS_DATABASE, cmd->ActualArg, &cmd->Buf);
             if (EdsRc != EDSLIB_SUCCESS)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "EdsLib_DataTypeDB_InitializeNativeObject(): %d\n", (int)EdsRc);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "EdsLib_DataTypeDB_InitializeNativeObject(): %d\n",
+                         (int)EdsRc);
                 cmd->PayloadState = EDS_LookupState_FAILED;
             }
             else
@@ -517,7 +545,8 @@ void EDS_ProcessParameterArgument(CommandData_t *cmd, const char *optarg)
     if (value == NULL)
     {
         snprintf(
-            cmd->LastErrorText, sizeof(cmd->LastErrorText),
+            cmd->LastErrorText,
+            sizeof(cmd->LastErrorText),
             "Parameter Argument: '%s' rejected. Must be in the form: 'x=y' where x is the name and y is the value\n",
             optarg);
         cmd->PayloadError = true;
@@ -534,21 +563,26 @@ void EDS_ProcessParameterArgument(CommandData_t *cmd, const char *optarg)
         EdsLib_DisplayDB_LocateSubEntity(&EDS_DATABASE, cmd->EdsPayloadInfo.EdsId, Desc.FullName, &Desc.EntityInfo);
     if (Result != EDSLIB_SUCCESS)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                 "Dest App Argument: '%s' rejected. Parameter not known.\n", optarg);
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "Dest App Argument: '%s' rejected. Parameter not known.\n",
+                 optarg);
         cmd->PayloadError = true;
         return;
     }
 
     CONSOLEUTILS_INFO("Parameter \'%s\' Located at payload offset %d\n", optarg, Desc.EntityInfo.Offset.Bytes);
 
-    Result = EdsLib_Scalar_FromString(&EDS_DATABASE, Desc.EntityInfo.EdsId,
+    Result = EdsLib_Scalar_FromString(&EDS_DATABASE,
+                                      Desc.EntityInfo.EdsId,
                                       &cmd->Buf.Byte[cmd->EdsPayloadInfo.Offset.Bytes + Desc.EntityInfo.Offset.Bytes],
                                       value);
     if (Result != 0)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                 "Parameter Argument: Value '%s' rejected. Unable to parse.\n", value);
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "Parameter Argument: Value '%s' rejected. Unable to parse.\n",
+                 value);
         cmd->PayloadError = true;
         return;
     }
@@ -686,7 +720,8 @@ void *EDS_Instantiate(void)
     obj->Params.Telecommand.InstanceNumber = 1;
 
     EdsRc = EdsLib_DataTypeDB_GetTypeInfo(
-        &EDS_DATABASE, EDSLIB_MAKE_ID(EDS_INDEX(CFE_HDR), EdsContainer_CFE_HDR_CommandHeader_DATADICTIONARY),
+        &EDS_DATABASE,
+        EDSLIB_MAKE_ID(EDS_INDEX(CFE_HDR), EdsContainer_CFE_HDR_CommandHeader_DATADICTIONARY),
         &obj->EdsHeaderInfo);
     if (EdsRc != EDSLIB_SUCCESS)
     {
@@ -723,7 +758,9 @@ void EDS_HelpUsage(void *arg)
     else if (EdsLib_Is_Valid(cmd->EdsPayloadInfo.EdsId))
     {
         printf("\nDefined Payload Fields (sizes in bits):\n");
-        EdsLib_DisplayDB_IterateAllEntities(&EDS_DATABASE, cmd->EdsPayloadInfo.EdsId, Enumerate_Members_Usage_Callback,
+        EdsLib_DisplayDB_IterateAllEntities(&EDS_DATABASE,
+                                            cmd->EdsPayloadInfo.EdsId,
+                                            Enumerate_Members_Usage_Callback,
                                             NULL);
     }
     else if (cmd->CmdName[0] == 0)
@@ -733,7 +770,10 @@ void EDS_HelpUsage(void *arg)
         while (EdsLib_DataTypeDB_GetDerivedTypeById(&EDS_DATABASE, cmd->IntfArg, Idx, &PossibleId) == EDSLIB_SUCCESS)
         {
             strcpy(ConstraintBuffer, "N/A");
-            EdsLib_DataTypeDB_ConstraintIterator(&EDS_DATABASE, cmd->IntfArg, PossibleId, Enumerate_Constraint_Callback,
+            EdsLib_DataTypeDB_ConstraintIterator(&EDS_DATABASE,
+                                                 cmd->IntfArg,
+                                                 PossibleId,
+                                                 Enumerate_Constraint_Callback,
                                                  ConstraintBuffer);
 
             printf("   %-40s (%s)\n", EdsLib_DisplayDB_GetBaseName(&EDS_DATABASE, PossibleId), ConstraintBuffer);
@@ -770,8 +810,10 @@ CmdSend_OptParse_t EDS_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             }
             else
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "endian selection: \'%s\' incompatible for EDS mode\n", ArgV->Text);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "endian selection: \'%s\' incompatible for EDS mode\n",
+                         ArgV->Text);
                 retcode = CmdSend_OptParse_INVALID;
             }
             break;
