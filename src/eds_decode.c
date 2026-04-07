@@ -69,7 +69,7 @@ void EDS_DecodeDisplay(void *Arg, const EdsLib_EntityDescriptor_t *Param)
     uint8_t *BasePtr;
     char     OutputBuffer[256];
 
-    BasePtr = (uint8_t *)Arg;
+    BasePtr  = (uint8_t *)Arg;
     BasePtr += Param->EntityInfo.Offset.Bytes;
     EdsLib_Scalar_ToString(&EDS_DATABASE, Param->EntityInfo.EdsId, OutputBuffer, sizeof(OutputBuffer), BasePtr);
     printf("%s(): Bit=%-4d %35s = %s\n", __func__, Param->EntityInfo.Offset.Bits, Param->FullName, OutputBuffer);
@@ -97,7 +97,7 @@ void *EDS_Instantiate(void)
  *-----------------------------------------------------------------*/
 bool EDS_DisplayObject(void *arg, const void *Data, size_t Size)
 {
-    EDS_Decoder_t *tlm = arg;
+    EDS_Decoder_t                           *tlm = arg;
     EdsLib_Id_t                              EdsId;
     EdsLib_DataTypeDB_TypeInfo_t             TypeInfo;
     EdsInterface_CFE_SB_SoftwareBus_PubSub_t PubSubParams;
@@ -121,10 +121,15 @@ bool EDS_DisplayObject(void *arg, const void *Data, size_t Size)
         return false;
     }
 
-    MaxSize.Bits = EdsLib_OCTETS_TO_BITS(Size);
+    MaxSize.Bits  = EdsLib_OCTETS_TO_BITS(Size);
     MaxSize.Bytes = sizeof(tlm->LocalBuffer);
 
-    Status = EdsLib_DataTypeDB_UnpackPartialObjectVarSize(&EDS_DATABASE, &EdsId, tlm->LocalBuffer.Byte, Data, &MaxSize, &ProcessedSize);
+    Status = EdsLib_DataTypeDB_UnpackPartialObjectVarSize(&EDS_DATABASE,
+                                                          &EdsId,
+                                                          tlm->LocalBuffer.Byte,
+                                                          Data,
+                                                          &MaxSize,
+                                                          &ProcessedSize);
     if (Status != EDSLIB_SUCCESS)
     {
         return false;
@@ -139,23 +144,32 @@ bool EDS_DisplayObject(void *arg, const void *Data, size_t Size)
         return false;
     }
 
-    Status = EdsLib_IntfDB_FindAllArgumentTypes(&EDS_DATABASE, CFE_SB_TELEMETRY_CMD_ID, TopicInfo.ParentIntfId,
-                                                &EdsId, 1);
+    Status =
+        EdsLib_IntfDB_FindAllArgumentTypes(&EDS_DATABASE, CFE_SB_TELEMETRY_CMD_ID, TopicInfo.ParentIntfId, &EdsId, 1);
     if (Status != EDSLIB_SUCCESS)
     {
         return false;
     }
 
-    Status = EdsLib_DataTypeDB_UnpackPartialObjectVarSize(&EDS_DATABASE, &EdsId, tlm->LocalBuffer.Byte, Data, &MaxSize, &ProcessedSize);
+    Status = EdsLib_DataTypeDB_UnpackPartialObjectVarSize(&EDS_DATABASE,
+                                                          &EdsId,
+                                                          tlm->LocalBuffer.Byte,
+                                                          Data,
+                                                          &MaxSize,
+                                                          &ProcessedSize);
     if (Status != EDSLIB_SUCCESS)
     {
         return false;
     }
 
-    CONSOLEUTILS_INFO("Formatcode=%08lx / %s\n", (unsigned long)EdsId,
-            EdsLib_DisplayDB_GetTypeName(&EDS_DATABASE, EdsId, TempBuffer, sizeof(TempBuffer)));
+    CONSOLEUTILS_INFO("Formatcode=%08lx / %s\n",
+                      (unsigned long)EdsId,
+                      EdsLib_DisplayDB_GetTypeName(&EDS_DATABASE, EdsId, TempBuffer, sizeof(TempBuffer)));
 
-    Status = EdsLib_DataTypeDB_VerifyUnpackedObject(&EDS_DATABASE, EdsId, tlm->LocalBuffer.Byte, Data,
+    Status = EdsLib_DataTypeDB_VerifyUnpackedObject(&EDS_DATABASE,
+                                                    EdsId,
+                                                    tlm->LocalBuffer.Byte,
+                                                    Data,
                                                     EDSLIB_DATATYPEDB_RECOMPUTE_NONE);
     if (Status != EDSLIB_SUCCESS)
     {

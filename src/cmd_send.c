@@ -60,50 +60,50 @@
 #define PROTOCOL_RAW       "raw"      /* No predefined header */
 
 const struct option CMDSEND_OPTION_LONGINFO[CmdSend_OptionId_MAX + 1] = {
-    [CmdSend_OptionId_help]      = {"help", no_argument, NULL, '?'},
-    [CmdSend_OptionId_verbose]   = {"verbose", no_argument, NULL, 'v'},
-    [CmdSend_OptionId_pktapid]   = {"pktapid", required_argument, NULL, 'A'},
-    [CmdSend_OptionId_pktpb]     = {"pktpb", required_argument, NULL, 'B'},
-    [CmdSend_OptionId_cmdcode]   = {"cmdcode", required_argument, NULL, 'C'},
-    [CmdSend_OptionId_pktfc]     = {"pktfc", required_argument, NULL, 'C'},
-    [CmdSend_OptionId_pktedsver] = {"pktedsver", required_argument, NULL, 'D'},
-    [CmdSend_OptionId_endian]    = {"endian", required_argument, NULL, 'E'},
-    [CmdSend_OptionId_pktseqflg] = {"pktseqflg", required_argument, NULL, 'F'},
-    [CmdSend_OptionId_pktname]   = {"pktname", required_argument, NULL, 'G'},
-    [CmdSend_OptionId_pktseqcnt] = {"pktseqcnt", required_argument, NULL, 'G'},
-    [CmdSend_OptionId_host]      = {"host", required_argument, NULL, 'H'},
-    [CmdSend_OptionId_pktid]     = {"pktid", required_argument, NULL, 'I'},
-    [CmdSend_OptionId_pktendian] = {"pktendian", required_argument, NULL, 'J'},
-    [CmdSend_OptionId_pktlen]    = {"pktlen", required_argument, NULL, 'L'},
-    [CmdSend_OptionId_port]      = {"port", required_argument, NULL, 'P'},
-    [CmdSend_OptionId_protocol]  = {"protocol", required_argument, NULL, 'Q'},
-    [CmdSend_OptionId_pktcksum]  = {"pktcksum", required_argument, NULL, 'R'},
-    [CmdSend_OptionId_pktsec]    = {"pktsec", required_argument, NULL, 'S'},
-    [CmdSend_OptionId_pkttype]   = {"pkttype", required_argument, NULL, 'T'},
-    [CmdSend_OptionId_pktsubsys] = {"pktsubsys", required_argument, NULL, 'U'},
-    [CmdSend_OptionId_pktver]    = {"pktver", required_argument, NULL, 'V'},
-    [CmdSend_OptionId_pktsys]    = {"pktsys", required_argument, NULL, 'Y'},
-    [CmdSend_OptionId_byte]      = {"byte", required_argument, NULL, 'b'},
-    [CmdSend_OptionId_int8]      = {"int8", required_argument, NULL, 'b'},
-    [CmdSend_OptionId_double]    = {"double", required_argument, NULL, 'd'},
-    [CmdSend_OptionId_float]     = {"float", required_argument, NULL, 'f'},
-    [CmdSend_OptionId_half]      = {"half", required_argument, NULL, 'h'},
-    [CmdSend_OptionId_int16]     = {"int16", required_argument, NULL, 'h'},
-    [CmdSend_OptionId_int16b]    = {"int16b", required_argument, NULL, 'i'},
-    [CmdSend_OptionId_int32b]    = {"int32b", required_argument, NULL, 'j'},
-    [CmdSend_OptionId_int64b]    = {"int64b", required_argument, NULL, 'k'},
-    [CmdSend_OptionId_long]      = {"long", required_argument, NULL, 'l'},
-    [CmdSend_OptionId_word]      = {"word", required_argument, NULL, 'l'},
-    [CmdSend_OptionId_int32]     = {"int32", required_argument, NULL, 'l'},
-    [CmdSend_OptionId_uint8]     = {"uint8", required_argument, NULL, 'm'},
-    [CmdSend_OptionId_uint16]    = {"uint16", required_argument, NULL, 'n'},
-    [CmdSend_OptionId_uint32]    = {"uint32", required_argument, NULL, 'o'},
-    [CmdSend_OptionId_uint64]    = {"uint64", required_argument, NULL, 'p'},
-    [CmdSend_OptionId_int64]     = {"int64", required_argument, NULL, 'q'},
-    [CmdSend_OptionId_string]    = {"string", required_argument, NULL, 's'},
-    [CmdSend_OptionId_uint16b]   = {"uint16b", required_argument, NULL, 'w'},
-    [CmdSend_OptionId_uint32b]   = {"uint32b", required_argument, NULL, 'x'},
-    [CmdSend_OptionId_uint64b]   = {"uint64b", required_argument, NULL, 'y'},
+    [CmdSend_OptionId_help]      = { "help",      no_argument,       NULL, '?' },
+    [CmdSend_OptionId_verbose]   = { "verbose",   no_argument,       NULL, 'v' },
+    [CmdSend_OptionId_pktapid]   = { "pktapid",   required_argument, NULL, 'A' },
+    [CmdSend_OptionId_pktpb]     = { "pktpb",     required_argument, NULL, 'B' },
+    [CmdSend_OptionId_cmdcode]   = { "cmdcode",   required_argument, NULL, 'C' },
+    [CmdSend_OptionId_pktfc]     = { "pktfc",     required_argument, NULL, 'C' },
+    [CmdSend_OptionId_pktedsver] = { "pktedsver", required_argument, NULL, 'D' },
+    [CmdSend_OptionId_endian]    = { "endian",    required_argument, NULL, 'E' },
+    [CmdSend_OptionId_pktseqflg] = { "pktseqflg", required_argument, NULL, 'F' },
+    [CmdSend_OptionId_pktname]   = { "pktname",   required_argument, NULL, 'G' },
+    [CmdSend_OptionId_pktseqcnt] = { "pktseqcnt", required_argument, NULL, 'G' },
+    [CmdSend_OptionId_host]      = { "host",      required_argument, NULL, 'H' },
+    [CmdSend_OptionId_pktid]     = { "pktid",     required_argument, NULL, 'I' },
+    [CmdSend_OptionId_pktendian] = { "pktendian", required_argument, NULL, 'J' },
+    [CmdSend_OptionId_pktlen]    = { "pktlen",    required_argument, NULL, 'L' },
+    [CmdSend_OptionId_port]      = { "port",      required_argument, NULL, 'P' },
+    [CmdSend_OptionId_protocol]  = { "protocol",  required_argument, NULL, 'Q' },
+    [CmdSend_OptionId_pktcksum]  = { "pktcksum",  required_argument, NULL, 'R' },
+    [CmdSend_OptionId_pktsec]    = { "pktsec",    required_argument, NULL, 'S' },
+    [CmdSend_OptionId_pkttype]   = { "pkttype",   required_argument, NULL, 'T' },
+    [CmdSend_OptionId_pktsubsys] = { "pktsubsys", required_argument, NULL, 'U' },
+    [CmdSend_OptionId_pktver]    = { "pktver",    required_argument, NULL, 'V' },
+    [CmdSend_OptionId_pktsys]    = { "pktsys",    required_argument, NULL, 'Y' },
+    [CmdSend_OptionId_byte]      = { "byte",      required_argument, NULL, 'b' },
+    [CmdSend_OptionId_int8]      = { "int8",      required_argument, NULL, 'b' },
+    [CmdSend_OptionId_double]    = { "double",    required_argument, NULL, 'd' },
+    [CmdSend_OptionId_float]     = { "float",     required_argument, NULL, 'f' },
+    [CmdSend_OptionId_half]      = { "half",      required_argument, NULL, 'h' },
+    [CmdSend_OptionId_int16]     = { "int16",     required_argument, NULL, 'h' },
+    [CmdSend_OptionId_int16b]    = { "int16b",    required_argument, NULL, 'i' },
+    [CmdSend_OptionId_int32b]    = { "int32b",    required_argument, NULL, 'j' },
+    [CmdSend_OptionId_int64b]    = { "int64b",    required_argument, NULL, 'k' },
+    [CmdSend_OptionId_long]      = { "long",      required_argument, NULL, 'l' },
+    [CmdSend_OptionId_word]      = { "word",      required_argument, NULL, 'l' },
+    [CmdSend_OptionId_int32]     = { "int32",     required_argument, NULL, 'l' },
+    [CmdSend_OptionId_uint8]     = { "uint8",     required_argument, NULL, 'm' },
+    [CmdSend_OptionId_uint16]    = { "uint16",    required_argument, NULL, 'n' },
+    [CmdSend_OptionId_uint32]    = { "uint32",    required_argument, NULL, 'o' },
+    [CmdSend_OptionId_uint64]    = { "uint64",    required_argument, NULL, 'p' },
+    [CmdSend_OptionId_int64]     = { "int64",     required_argument, NULL, 'q' },
+    [CmdSend_OptionId_string]    = { "string",    required_argument, NULL, 's' },
+    [CmdSend_OptionId_uint16b]   = { "uint16b",   required_argument, NULL, 'w' },
+    [CmdSend_OptionId_uint32b]   = { "uint32b",   required_argument, NULL, 'x' },
+    [CmdSend_OptionId_uint64b]   = { "uint64b",   required_argument, NULL, 'y' },
 };
 
 /*
@@ -115,7 +115,8 @@ static const CmdSend_Parser_API_t *CMDSEND_PARSER_API[] = {
 #ifdef CFE_EDS_ENABLED
     &EDS_API,
 #endif
-    &PassThru_API};
+    &PassThru_API
+};
 
 #define CMDSEND_MAX_NUM_PARSERS (sizeof(CMDSEND_PARSER_API) / sizeof(CMDSEND_PARSER_API[0]))
 
@@ -172,16 +173,21 @@ void DisplayUsage(char *Name)
     printf("    -H, --host: Destination hostname or IP address (Default = %s)\n", DEFAULT_HOSTNAME);
     printf("    -P, --port: Destination port (default = %s)\n", DEFAULT_PORT);
     printf("  - Packet format options:\n");
-    printf("    -E, --endian: Default endian for unnamed fields/payload: [%s|%s] (default = %s)\n", ENDIAN_BIG,
-           ENDIAN_LITTLE, endian);
+    printf("    -E, --endian: Default endian for unnamed fields/payload: [%s|%s] (default = %s)\n",
+           ENDIAN_BIG,
+           ENDIAN_LITTLE,
+           endian);
     printf("    -Q, --protocol: Sets allowed named fields and header layout (default = %s)\n", DEFAULT_PROTOCOL);
     printf("        %8s = no predefined fields/layout\n", PROTOCOL_RAW);
     printf("        %8s = CCSDS Pri header only\n", PROTOCOL_CCSDS_PRI);
     printf("        %8s = CCSDS Pri and Ext headers\n", PROTOCOL_CCSDS_EXT);
     printf("        %8s = CCSDS Pri and cFS Cmd Sec headers\n", PROTOCOL_CFS_V1);
     printf("        %8s = CCSDS Pri, Ext, and cFS Cmd Sec headers\n", PROTOCOL_CFS_V2);
-    printf("  - CCSDS Primary Header named fields (protocol=[%s|%s|%s|%s])\n", PROTOCOL_CCSDS_PRI, PROTOCOL_CCSDS_EXT,
-           PROTOCOL_CFS_V1, PROTOCOL_CFS_V2);
+    printf("  - CCSDS Primary Header named fields (protocol=[%s|%s|%s|%s])\n",
+           PROTOCOL_CCSDS_PRI,
+           PROTOCOL_CCSDS_EXT,
+           PROTOCOL_CFS_V1,
+           PROTOCOL_CFS_V2);
     printf("    -I, --pktid: macro for setting first 16 bits of CCSDS Primary header\n");
     printf("    -V, --pktver: Packet version number (range=0-0x7)\n");
     printf("    -T, --pkttype: !OVERRIDE! Packet type (default is cmd, 0=tlm, 1=cmd)\n");
@@ -308,11 +314,11 @@ void CollectOptions(int argc, char *argv[])
         {
             ++ConsoleUtils_Verbosity;
         }
-        else  if (argv_ptr->OptionId == CmdSend_OptionId_host)
+        else if (argv_ptr->OptionId == CmdSend_OptionId_host)
         {
             strncpy(CommandData.HostName, optarg, sizeof(CommandData.HostName) - 1);
         }
-        else  if (argv_ptr->OptionId == CmdSend_OptionId_port)
+        else if (argv_ptr->OptionId == CmdSend_OptionId_port)
         {
             strncpy(CommandData.PortNum, optarg, sizeof(CommandData.PortNum) - 1);
         }

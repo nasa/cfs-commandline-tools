@@ -164,8 +164,8 @@ CmdSend_OptParse_t PassThru_SetProtocol(CommandData_t *cmd, CmdSend_Protocol_t S
  *  - fieldexists = process helper, returns if false
  *
  *-----------------------------------------------------------------*/
-CmdSend_OptParse_t PassThru_ProcessField(CommandData_t *cmd, uint16_t *orig, const char *in, const uint16_t mask,
-                                         bool fieldexists)
+CmdSend_OptParse_t
+PassThru_ProcessField(CommandData_t *cmd, uint16_t *orig, const char *in, const uint16_t mask, bool fieldexists)
 {
     long int     templong;
     unsigned int shift = 0;
@@ -174,8 +174,12 @@ CmdSend_OptParse_t PassThru_ProcessField(CommandData_t *cmd, uint16_t *orig, con
     /* Check if protocol includes field */
     if (!fieldexists)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                 "ERROR: %s:%u - Field does not exist for selected protocol: %s\n", __func__, __LINE__, in);
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "ERROR: %s:%u - Field does not exist for selected protocol: %s\n",
+                 __func__,
+                 __LINE__,
+                 in);
         return CmdSend_OptParse_INVALID;
     }
 
@@ -189,23 +193,39 @@ CmdSend_OptParse_t PassThru_ProcessField(CommandData_t *cmd, uint16_t *orig, con
     templong = strtoul(in, &tail, 0);
     if (errno != 0 || tail == in)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText), "ERROR: %s:%u - String conversion (%s): %s\n",
-                 __func__, __LINE__, in, strerror(errno));
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "ERROR: %s:%u - String conversion (%s): %s\n",
+                 __func__,
+                 __LINE__,
+                 in,
+                 strerror(errno));
         return CmdSend_OptParse_INVALID;
     }
 
     if (*tail != 0)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                 "ERROR: %s:%u - Trailing characters (%s) in parameter %s\n", __func__, __LINE__, tail, in);
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "ERROR: %s:%u - Trailing characters (%s) in parameter %s\n",
+                 __func__,
+                 __LINE__,
+                 tail,
+                 in);
         return CmdSend_OptParse_INVALID;
     }
 
     templong <<= shift;
     if ((templong & ~mask) != 0)
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                 "ERROR: %s:%u - Parameter 0x%lX (%s<<%u) exceeds mask 0x%X\n", __func__, __LINE__, templong, in, shift,
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "ERROR: %s:%u - Parameter 0x%lX (%s<<%u) exceeds mask 0x%X\n",
+                 __func__,
+                 __LINE__,
+                 templong,
+                 in,
+                 shift,
                  mask);
         return CmdSend_OptParse_INVALID;
     }
@@ -225,9 +245,14 @@ CmdSend_OptParse_t PassThru_CopyData(CommandData_t *cmd, char *in, unsigned int 
     /* Ensure space */
     if ((cmd->payload_bytes + nbytes) > sizeof(cmd->Payload))
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                 "ERROR %s:%u - Exceeded packet size, startbyte = %u, nbytes = %u, max = %u\n", __func__, __LINE__,
-                 cmd->payload_bytes, nbytes, (unsigned)sizeof(cmd->Payload));
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "ERROR %s:%u - Exceeded packet size, startbyte = %u, nbytes = %u, max = %u\n",
+                 __func__,
+                 __LINE__,
+                 cmd->payload_bytes,
+                 nbytes,
+                 (unsigned)sizeof(cmd->Payload));
         return CmdSend_OptParse_INVALID;
     }
 
@@ -249,9 +274,14 @@ CmdSend_OptParse_t PassThru_PadData(CommandData_t *cmd, int val, unsigned int nb
     /* Ensure space */
     if ((cmd->payload_bytes + nbytes) > sizeof(cmd->Payload))
     {
-        snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                 "ERROR %s:%u - Exceeded packet size, startbyte = %u, nbytes = %u, max = %u\n", __func__, __LINE__,
-                 cmd->payload_bytes, nbytes, (unsigned)sizeof(cmd->Payload));
+        snprintf(cmd->LastErrorText,
+                 sizeof(cmd->LastErrorText),
+                 "ERROR %s:%u - Exceeded packet size, startbyte = %u, nbytes = %u, max = %u\n",
+                 __func__,
+                 __LINE__,
+                 cmd->payload_bytes,
+                 nbytes,
+                 (unsigned)sizeof(cmd->Payload));
         return CmdSend_OptParse_INVALID;
     }
 
@@ -362,8 +392,10 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             }
             else
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "endian selection: \'%s\' incompatible for passthrough mode\n", ArgV->Text);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "endian selection: \'%s\' incompatible for passthrough mode\n",
+                         ArgV->Text);
                 retcode = CmdSend_OptParse_INVALID;
             }
             break;
@@ -418,8 +450,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempint8 = templl;
             if (tail == ArgV->Text || tempint8 != templl)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not int8: \'%s\' -> %d\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not int8: \'%s\' -> %d\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (int)tempint8);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -437,8 +473,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempd = strtod(ArgV->Text, &tail);
             if (tail == ArgV->Text)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText), "ERROR %s:%u - Parameter not double: %s\n",
-                         __func__, __LINE__, ArgV->Text);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not double: %s\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text);
                 retcode = CmdSend_OptParse_INVALID;
             }
             else
@@ -463,8 +503,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempf = strtof(ArgV->Text, &tail);
             if (tail == ArgV->Text)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText), "ERROR %s:%u - Parameter not float: %s\n",
-                         __func__, __LINE__, ArgV->Text);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not float: %s\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text);
                 retcode = CmdSend_OptParse_INVALID;
             }
             else
@@ -491,8 +535,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempint16 = templl;
             if (tail == ArgV->Text || tempint16 != templl)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not int16: \'%s\' -> %d\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not int16: \'%s\' -> %d\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (int)tempint16);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -519,8 +567,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempint32 = templl;
             if (tail == ArgV->Text || tempint32 != templl)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not int32: \'%s\' -> %ld\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not int32: \'%s\' -> %ld\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (long)tempint32);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -544,8 +596,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempuint8 = tempull;
             if (tail == ArgV->Text || tempuint8 != tempull)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not uint8: \'%s\' -> %u\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not uint8: \'%s\' -> %u\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (unsigned int)tempuint8);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -564,8 +620,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempuint16 = tempull;
             if (tail == ArgV->Text || tempuint16 != tempull)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not uint16: \'%s\' -> %u\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not uint16: \'%s\' -> %u\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (unsigned int)tempuint16);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -590,8 +650,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempuint32 = tempull;
             if (tail == ArgV->Text || tempuint32 != tempull)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not uint32: \'%s\' -> %lu\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not uint32: \'%s\' -> %lu\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (unsigned long)tempuint32);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -616,8 +680,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempuint64 = tempull;
             if (tail == ArgV->Text || tempuint64 != tempull)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not uint64: \'%s\' -> %llu\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not uint64: \'%s\' -> %llu\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (unsigned long long)tempuint64);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -642,8 +710,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
             tempint64 = templl;
             if (tail == ArgV->Text || tempint64 != templl)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR %s:%u - Parameter not int64: \'%s\' -> %lld\n", __func__, __LINE__, ArgV->Text,
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR %s:%u - Parameter not int64: \'%s\' -> %lld\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text,
                          (long long)tempint64);
                 retcode = CmdSend_OptParse_INVALID;
             }
@@ -667,8 +739,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
 
             if (*tail != ':' || tempull == 0)
             {
-                snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                         "ERROR: %s:%u - String format is NNN:string, not: \'%s\'\n", __func__, __LINE__, ArgV->Text);
+                snprintf(cmd->LastErrorText,
+                         sizeof(cmd->LastErrorText),
+                         "ERROR: %s:%u - String format is NNN:string, not: \'%s\'\n",
+                         __func__,
+                         __LINE__,
+                         ArgV->Text);
                 retcode = CmdSend_OptParse_INVALID;
             }
             else
@@ -677,8 +753,12 @@ CmdSend_OptParse_t PassThru_ParseOption(void *obj, const CmdSend_ArgV_t *ArgV)
                 len = strlen(tail);
                 if (len > tempull)
                 {
-                    snprintf(cmd->LastErrorText, sizeof(cmd->LastErrorText),
-                             "ERROR: %s:%u - Trailing characters (%s) in argument: \'%s\'\n", __func__, __LINE__, tail,
+                    snprintf(cmd->LastErrorText,
+                             sizeof(cmd->LastErrorText),
+                             "ERROR: %s:%u - Trailing characters (%s) in argument: \'%s\'\n",
+                             __func__,
+                             __LINE__,
+                             tail,
                              ArgV->Text);
                     retcode = CmdSend_OptParse_INVALID;
                 }
