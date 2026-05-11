@@ -45,7 +45,8 @@ static const TlmRecv_Display_API_t *TLMRECV_DISPLAY_API[] = {
 #ifdef CFE_EDS_ENABLED
     &EDS_API,
 #endif
-    &PassThru_API};
+    &PassThru_API
+};
 
 #define TLMRECV_MAX_NUM_DISPLAYS (sizeof(TLMRECV_DISPLAY_API) / sizeof(TLMRECV_DISPLAY_API[0]))
 
@@ -55,11 +56,11 @@ static const char *optString = "c:p:v?";
 ** getopts_long long form argument table
 */
 static struct option longOpts[] = {
-    {"cpu", required_argument, NULL, 'c'},
-    {"port", required_argument, NULL, 'p'},
-    {"verbose", no_argument, NULL, 'v'},
-    {"help", no_argument, NULL, '?'},
-    {NULL, no_argument, NULL, 0}
+    { "cpu",     required_argument, NULL, 'c' },
+    { "port",    required_argument, NULL, 'p' },
+    { "verbose", no_argument,       NULL, 'v' },
+    { "help",    no_argument,       NULL, '?' },
+    { NULL,      no_argument,       NULL, 0   }
 };
 
 typedef struct TlmRecv_Display
@@ -74,7 +75,7 @@ typedef struct
 {
     bool ShowHelp;
 
-    int                 NumDisplays;
+    int               NumDisplays;
     TlmRecv_Display_t Display[TLMRECV_MAX_NUM_DISPLAYS];
 
     uint8_t NetBuf[TLMRECV_MAX_PACKET_SIZE];
@@ -91,9 +92,9 @@ TlmData_t TlmData;
  *-----------------------------------------------------------------*/
 void InstantiateDisplays(void)
 {
-    TlmRecv_Display_t        *disp;
+    TlmRecv_Display_t           *disp;
     const TlmRecv_Display_API_t *API;
-    int                         j;
+    int                          j;
 
     for (j = 0; j < TLMRECV_MAX_NUM_DISPLAYS; ++j)
     {
@@ -118,7 +119,7 @@ void InstantiateDisplays(void)
 void DestroyDisplays(void)
 {
     TlmRecv_Display_t *disp;
-    int                  j;
+    int                j;
 
     for (j = 0; j < TlmData.NumDisplays; ++j)
     {
@@ -139,14 +140,14 @@ void DestroyDisplays(void)
  *-----------------------------------------------------------------*/
 void DisplayObject(const void *Data, size_t Size)
 {
-    TlmRecv_Display_t *disp;
+    TlmRecv_Display_t           *disp;
     const TlmRecv_Display_API_t *API;
-    int                  j;
+    int                          j;
 
     for (j = 0; j < TlmData.NumDisplays; ++j)
     {
         disp = &TlmData.Display[j];
-        API = TLMRECV_DISPLAY_API[j];
+        API  = TLMRECV_DISPLAY_API[j];
 
         if (disp->Obj != NULL && API != NULL)
         {
@@ -159,7 +160,6 @@ void DisplayObject(const void *Data, size_t Size)
     }
 }
 
-
 /*----------------------------------------------------------------
  *
  * MAIN ROUTINE
@@ -167,11 +167,11 @@ void DisplayObject(const void *Data, size_t Size)
  *-----------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
-    int                                      opt       = 0;
-    int                                      longIndex = 0;
-    int                                      sd, rc, n, cliLen;
-    struct sockaddr_in                       cliAddr, servAddr;
-    unsigned short                           Port;
+    int                opt       = 0;
+    int                longIndex = 0;
+    int                sd, rc, n, cliLen;
+    struct sockaddr_in cliAddr, servAddr;
+    unsigned short     Port;
 
     memset(&TlmData, 0, sizeof(TlmData));
 
@@ -233,7 +233,6 @@ int main(int argc, char *argv[])
     /* server infinite loop */
     while (1)
     {
-
         /*
         ** receive message
         */
@@ -251,7 +250,10 @@ int main(int argc, char *argv[])
         ** print received message
         */
 
-        CONSOLEUTILS_INFO("Telemetry Packet From: %s:UDP%u, %u bytes\n", inet_ntoa(cliAddr.sin_addr), ntohs(cliAddr.sin_port), n);
+        CONSOLEUTILS_INFO("Telemetry Packet From: %s:UDP%u, %u bytes\n",
+                          inet_ntoa(cliAddr.sin_addr),
+                          ntohs(cliAddr.sin_port),
+                          n);
 
         DisplayObject(TlmData.NetBuf, n);
 
