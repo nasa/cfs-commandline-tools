@@ -805,6 +805,7 @@ bool PassThru_GetPackedObject(void *obj, void *buf, size_t *sz)
     CommandData_t *cmd = obj;
     uint8_t       *out = buf;
     size_t         nbytes;
+    size_t         checksum_offset = 0;
 
     nbytes = cmd->payload_bytes;
     if (cmd->IncludeCCSDSPri)
@@ -863,15 +864,18 @@ bool PassThru_GetPackedObject(void *obj, void *buf, size_t *sz)
     {
         memcpy(&out[nbytes], &cmd->CFS_CmdSecHdr, sizeof(cmd->CFS_CmdSecHdr));
         nbytes += sizeof(cmd->CFS_CmdSecHdr);
-
-        if (!cmd->OverridePktCksum)
-        {
-            out[nbytes - 1] = PassThru_CalcChecksum(out, nbytes);
-        }
+        checksum_offset = nbytes - 1;
     }
 
     memcpy(&out[nbytes], cmd->Payload, cmd->payload_bytes);
     nbytes += cmd->payload_bytes;
+
+    if (cmd->IncludeCFSSec && !cmd->OverridePktCksum)
+    {
+        /* The cFS checksum covers the complete packet, including its payload. */
+        out[checksum_offset] = 0;
+        out[checksum_offset] = PassThru_CalcChecksum(out, nbytes);
+    }
 
     *sz = nbytes;
 
