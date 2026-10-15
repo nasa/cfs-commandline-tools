@@ -24,6 +24,12 @@
 
 include_directories(${MISSION_BINARY_DIR}/inc)
 
+if (IS_CFS_MISSION_BUILD)
+   set(TOOL_INSTALL_DEST host)
+else()
+   set(TOOL_INSTALL_DEST bin)
+endif()
+
 set(UTIL_LINK_LIBS)
 set(CMDSEND_SOURCE_LIST
     src/cmd_send.c
@@ -62,10 +68,10 @@ endif()
 add_executable(cmd_send ${CMDSEND_SOURCE_LIST})
 target_compile_definitions(cmd_send PUBLIC _DEFAULT_SOURCE _BSD_SOURCE)
 target_link_libraries(cmd_send ${UTIL_LINK_LIBS})
-install(TARGETS cmd_send DESTINATION host)
+install(TARGETS cmd_send DESTINATION ${TOOL_INSTALL_DEST})
 
 
 # CMake snippet for building tlm display/decoder tool
 add_executable(tlm_recv ${TLMRECV_SOURCE_LIST})
 target_link_libraries(tlm_recv ${UTIL_LINK_LIBS})
-install(TARGETS tlm_recv DESTINATION host)
+install(TARGETS tlm_recv DESTINATION ${TOOL_INSTALL_DEST})
